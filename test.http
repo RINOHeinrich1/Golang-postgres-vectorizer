@@ -28,6 +28,6 @@ POST http://localhost:7777/formatrows
   "password": "testpass",
   "dbname": "testdb",
   "table_name": "produits",
-  "template": "Produit: {{.nom}}, Description: {{.description}}, Prix: {{.prix}} EUR, Stock: {{.stock}}",
+  "template": "Le  {{.nom}} porte la description suivante: {{.description}}, il coûte: {{.prix}} EUR",
   "page_size": 50
 }
