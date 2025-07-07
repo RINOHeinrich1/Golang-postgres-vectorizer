@@ -19,3 +19,15 @@ POST  http://localhost:7777/generetestdatabase
 }
 
 GET http://localhost:7777/tables?host=localhost&port=5432&user=testuser&password=testpass&dbname=testdb
+
+POST http://localhost:7777/formatrows
+{
+  "host": "localhost",
+  "port": 5432,
+  "user": "testuser",
+  "password": "testpass",
+  "dbname": "testdb",
+  "table_name": "produits",
+  "template": "Produit: {{.nom}}, Description: {{.description}}, Prix: {{.prix}} EUR, Stock: {{.stock}}",
+  "page_size": 50
+}
