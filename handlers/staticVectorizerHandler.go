@@ -12,7 +12,7 @@ import (
 	"github.com/RINOHeinrich1/postgres-vectorizer/utils"
 )
 
-func FormatRowsHandler(w http.ResponseWriter, r *http.Request) {
+func StaticVectorizerHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 		return

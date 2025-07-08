@@ -20,7 +20,8 @@ POST  http://localhost:7777/generetestdatabase
 
 GET http://localhost:7777/tables?host=localhost&port=5432&user=testuser&password=testpass&dbname=testdb
 
-POST http://localhost:7777/formatrows
+POST http://localhost:7777/staticvectorizer
+
 {
   "host": "localhost",
   "port": 5432,

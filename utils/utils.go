@@ -21,10 +21,13 @@ func SendToQdrant(text string, pointID string) error {
 	}
 
 	url := fmt.Sprintf("%s/collections/%s/points?wait=true", qdrantURL, collection)
-
+	vector, err := Embed(text)
+	if err != nil {
+		return fmt.Errorf("erreur embedding: %w", err)
+	}
 	point := models.QdrantPoint{
 		ID:     pointID,
-		Vector: []float64{}, // à remplacer par vecteur réel si tu intègres embedding
+		Vector: vector,
 		Payload: map[string]interface{}{
 			"text": text,
 		},

@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/RINOHeinrich1/postgres-vectorizer/handlers"
+	"github.com/RINOHeinrich1/postgres-vectorizer/middlewares"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
@@ -16,11 +17,16 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/connect", handlers.ConnectHandler)
-	http.HandleFunc("/generetestdatabase", handlers.GenerateTestDatabaseHandler)
-	http.HandleFunc("/tables", handlers.GetTablesHandler)
-	http.HandleFunc("/formatrows", handlers.FormatRowsHandler)
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/connect", handlers.ConnectHandler)
+	mux.HandleFunc("/generetestdatabase", handlers.GenerateTestDatabaseHandler)
+	mux.HandleFunc("/tables", handlers.GetTablesHandler)
+	mux.HandleFunc("/staticvectorizer", handlers.StaticVectorizerHandler)
+
+	// Appliquer middleware CORS à tout le mux
+	handlerWithCORS := middlewares.CORSMiddleware(mux)
 
 	fmt.Println("Serveur lancé sur http://localhost:7777")
-	log.Fatal(http.ListenAndServe(":7777", nil))
+	log.Fatal(http.ListenAndServe(":7777", handlerWithCORS))
 }
