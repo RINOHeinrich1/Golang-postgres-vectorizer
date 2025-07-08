@@ -10,7 +10,7 @@ import (
 	"github.com/qdrant/go-client/qdrant"
 )
 
-func SendToQdrant(text, source string, userId string) error {
+func SendToQdrant(text, source string, userId string, dataId string) error {
 	host := os.Getenv("QDRANT_HOST")
 	portStr := os.Getenv("QDRANT_PORT")
 	apiKey := os.Getenv("QDRANT_API_KEY")
@@ -50,6 +50,7 @@ func SendToQdrant(text, source string, userId string) error {
 			"text":     text,
 			"source":   source,
 			"owner_id": userId,
+			"data_id":  dataId,
 		}),
 	}
 

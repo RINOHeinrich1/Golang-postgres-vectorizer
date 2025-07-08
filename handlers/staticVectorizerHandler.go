@@ -114,9 +114,9 @@ func StaticVectorizerHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			// Envoi à Qdrant
-			//pointID := fmt.Sprintf("%s_%d", req.TableName, totalProcessed)
 			source := fmt.Sprintf("%s/%s", req.DBName, req.TableName)
-			if err := utils.SendToQdrant(buf.String(), source, userID); err != nil {
+			dataID := fmt.Sprintf("%v", data["id"])
+			if err := utils.SendToQdrant(buf.String(), source, userID, dataID); err != nil {
 				rows.Close()
 				http.Error(w, "Erreur envoi à Qdrant: "+err.Error(), http.StatusInternalServerError)
 				return

@@ -20,7 +20,9 @@ func init() {
 }
 
 func main() {
-	// Charger config Qdrant depuis env
+	_ = godotenv.Load()
+
+	// --- Qdrant ---
 	host := os.Getenv("QDRANT_HOST")
 	portStr := os.Getenv("QDRANT_PORT")
 	apiKey := os.Getenv("QDRANT_API_KEY")
@@ -47,12 +49,10 @@ func main() {
 	}
 
 	ctx := context.Background()
-
 	exists, err := client.CollectionExists(ctx, collection)
 	if err != nil {
 		log.Fatalf("Erreur vérification collection : %v", err)
 	}
-
 	if exists {
 		fmt.Println("✅ La collection existe déjà.")
 	} else {
@@ -63,8 +63,8 @@ func main() {
 			VectorsConfig: &qdrant.VectorsConfig{
 				Config: &qdrant.VectorsConfig_Params{
 					Params: &qdrant.VectorParams{
-						Size:     384,                    // Taille du vecteur, selon ton embedder
-						Distance: qdrant.Distance_Cosine, // Cosine, Euclidean, Dot
+						Size:     384,
+						Distance: qdrant.Distance_Cosine,
 					},
 				},
 			},
@@ -73,19 +73,51 @@ func main() {
 		if err != nil {
 			log.Fatalf("❌ Erreur lors de la création de la collection : %v", err)
 		}
+		// Indexer le champ owner_id
+		_, err = client.CreateFieldIndex(ctx, &qdrant.CreateFieldIndexCollection{
+			CollectionName: collection,
+			FieldName:      "owner_id",
+			FieldType:      qdrant.FieldType_FieldTypeKeyword.Enum(),
+		})
+		if err != nil {
+			log.Fatalf("Erreur lors de l'indexation du champ owner_id : %v", err)
+		}
+
+		// Indexer le champ source
+		_, err = client.CreateFieldIndex(ctx, &qdrant.CreateFieldIndexCollection{
+			CollectionName: collection,
+			FieldName:      "source",
+			FieldType:      qdrant.FieldType_FieldTypeKeyword.Enum(),
+		})
+		if err != nil {
+			log.Fatalf("Erreur lors de l'indexation du champ source : %v", err)
+		}
+
 		fmt.Println("✅ Collection créée avec succès.")
 	}
 
-	// Lancement du serveur HTTP
+	// --- Serveur HTTP ---
+	bindAddr := os.Getenv("BIND_ADDR")
+	if bindAddr == "" {
+		bindAddr = "127.0.0.1"
+	}
+
+	serverPort := os.Getenv("SERVER_PORT")
+	if serverPort == "" {
+		serverPort = "7777"
+	}
+
+	address := fmt.Sprintf("%s:%s", bindAddr, serverPort)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/connect", handlers.ConnectHandler)
 	mux.HandleFunc("/generetestdatabase", handlers.GenerateTestDatabaseHandler)
 	mux.HandleFunc("/tables", handlers.GetTablesHandler)
 	mux.HandleFunc("/staticvectorizer", handlers.StaticVectorizerHandler)
+	mux.HandleFunc("/deletevectorizeddata", handlers.DeleteVectorizedDataHandler)
 
-	// Appliquer JWT puis CORS
 	protectedHandler := middlewares.CORSMiddleware(middlewares.JWTMiddleware(mux))
 
-	fmt.Println("🚀 Serveur lancé sur http://localhost:7777")
-	log.Fatal(http.ListenAndServe(":7777", protectedHandler))
+	fmt.Printf("🚀 Serveur lancé sur http://%s\n", address)
+	log.Fatal(http.ListenAndServe(address, protectedHandler))
 }
