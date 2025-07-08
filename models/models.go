@@ -30,7 +30,7 @@ type FormatRequest struct {
 
 type QdrantPoint struct {
 	ID      string                 `json:"id"`
-	Vector  []float64              `json:"vector"` // ici vecteur vide car tu n'as pas intégré l'embedding
+	Vector  []float32              `json:"vector"` // ici vecteur vide car tu n'as pas intégré l'embedding
 	Payload map[string]interface{} `json:"payload"`
 }
 
