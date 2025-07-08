@@ -8,6 +8,8 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/RINOHeinrich1/postgres-vectorizer/middlewares"
+
 	"github.com/RINOHeinrich1/postgres-vectorizer/models"
 	"github.com/RINOHeinrich1/postgres-vectorizer/utils"
 )
@@ -15,6 +17,11 @@ import (
 func StaticVectorizerHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
+		return
+	}
+	userID, ok := middlewares.GetUserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "Utilisateur non authentifié", http.StatusUnauthorized)
 		return
 	}
 
@@ -109,7 +116,7 @@ func StaticVectorizerHandler(w http.ResponseWriter, r *http.Request) {
 			// Envoi à Qdrant
 			//pointID := fmt.Sprintf("%s_%d", req.TableName, totalProcessed)
 			source := fmt.Sprintf("%s/%s", req.DBName, req.TableName)
-			if err := utils.SendToQdrant(buf.String(), source); err != nil {
+			if err := utils.SendToQdrant(buf.String(), source, userID); err != nil {
 				rows.Close()
 				http.Error(w, "Erreur envoi à Qdrant: "+err.Error(), http.StatusInternalServerError)
 				return
