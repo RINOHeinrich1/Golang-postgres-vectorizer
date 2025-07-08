@@ -83,8 +83,9 @@ func main() {
 	mux.HandleFunc("/tables", handlers.GetTablesHandler)
 	mux.HandleFunc("/staticvectorizer", handlers.StaticVectorizerHandler)
 
-	handlerWithCORS := middlewares.CORSMiddleware(mux)
+	// Appliquer JWT puis CORS
+	protectedHandler := middlewares.CORSMiddleware(middlewares.JWTMiddleware(mux))
 
 	fmt.Println("🚀 Serveur lancé sur http://localhost:7777")
-	log.Fatal(http.ListenAndServe(":7777", handlerWithCORS))
+	log.Fatal(http.ListenAndServe(":7777", protectedHandler))
 }
