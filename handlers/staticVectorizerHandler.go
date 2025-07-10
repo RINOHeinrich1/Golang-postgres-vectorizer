@@ -68,7 +68,7 @@ func StaticVectorizerHandler(w http.ResponseWriter, r *http.Request) {
 	totalProcessed := 0
 
 	for {
-		rows, err := db.Query(fmt.Sprintf("SELECT * FROM %s LIMIT %d OFFSET %d", req.TableName, req.PageSize, offset))
+		rows, err := db.Query(fmt.Sprintf(`SELECT * FROM "%s" LIMIT %d OFFSET %d`, req.TableName, req.PageSize, offset))
 		if err != nil {
 			http.Error(w, "Erreur requête SQL: "+err.Error(), http.StatusInternalServerError)
 			return
