@@ -14,6 +14,22 @@ import (
 	"github.com/RINOHeinrich1/postgres-vectorizer/utils"
 )
 
+func getPrimaryKey(db *sql.DB, tableName string) (string, error) {
+	query := fmt.Sprintf(`
+		SELECT a.attname
+		FROM   pg_index i
+		JOIN   pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+		WHERE  i.indrelid = '"%s"'::regclass AND i.indisprimary;
+	`, tableName) // ⚠️ attention à l'injection SQL si la tableName est mal contrôlée
+
+	var primaryKey string
+	err := db.QueryRow(query).Scan(&primaryKey)
+	if err != nil {
+		return "", fmt.Errorf("clé primaire introuvable pour %s : %w", tableName, err)
+	}
+	return primaryKey, nil
+}
+
 func StaticVectorizerHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
@@ -115,7 +131,16 @@ func StaticVectorizerHandler(w http.ResponseWriter, r *http.Request) {
 
 			// Envoi à Qdrant
 			source := fmt.Sprintf("%s/%s", req.DBName, req.TableName)
-			dataID := fmt.Sprintf("%v", data["id"])
+			// Récupération de la clé primaire
+			primaryKey, err := getPrimaryKey(db, req.TableName)
+			if err != nil {
+				http.Error(w, "Erreur récupération clé primaire: "+err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			idValue := data[primaryKey]
+			dataID := fmt.Sprintf("%v", idValue)
+
 			if err := utils.SendToQdrant(buf.String(), source, userID, dataID); err != nil {
 				rows.Close()
 				http.Error(w, "Erreur envoi à Qdrant: "+err.Error(), http.StatusInternalServerError)

@@ -115,6 +115,8 @@ func main() {
 	mux.HandleFunc("/tables", handlers.GetTablesHandler)
 	mux.HandleFunc("/staticvectorizer", handlers.StaticVectorizerHandler)
 	mux.HandleFunc("/deletevectorizeddata", handlers.DeleteVectorizedDataHandler)
+	mux.HandleFunc("/ask", handlers.AskHandler)
+	mux.HandleFunc("/execute", handlers.ExecuteSQLHandler)
 
 	protectedHandler := middlewares.CORSMiddleware(middlewares.JWTMiddleware(mux))
 

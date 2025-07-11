@@ -32,3 +32,26 @@ POST http://localhost:7777/staticvectorizer
   "template": "Le  {{.nom}} porte la description suivante: {{.description}}, il coûte: {{.prix}} EUR",
   "page_size": 50
 }
+
+POST http://localhost:7777/ask
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6IjZheHdLZFJDNUd0eW9hK1ciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL21lcWxid3hxY3llcWt2YXJlZ3BxLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyNjMwMWY3ZC1kYjgzLTRiNjctOThiYy02NTAwY2Q0ZTY2ZWYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUyMTUwNTY2LCJpYXQiOjE3NTIxNDY5NjYsImVtYWlsIjoiY29udGFjdEBvbmlydGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MjE0Njk2Nn1dLCJzZXNzaW9uX2lkIjoiNzFjNDBkYmUtNDVkZC00YjA4LTg2ZGEtYjJiMzViYTFlMjRlIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.7fXtJzYTxuLZvnBOgrF3Lm1fSFOTmcD9j-_153eJPys
+Content-Type: application/json
+
+{
+  "query": "Ou habites Mme Park?",
+  "top_k": 3
+}
+
+POST https://postgresvectorizer.onirtech.com/execute
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6IjZheHdLZFJDNUd0eW9hK1ciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL21lcWxid3hxY3llcWt2YXJlZ3BxLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyNjMwMWY3ZC1kYjgzLTRiNjctOThiYy02NTAwY2Q0ZTY2ZWYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUyMjI4ODcyLCJpYXQiOjE3NTIyMjUyNzIsImVtYWlsIjoiY29udGFjdEBvbmlydGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MjE0Njk2Nn1dLCJzZXNzaW9uX2lkIjoiNzFjNDBkYmUtNDVkZC00YjA4LTg2ZGEtYjJiMzViYTFlMjRlIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.RfYUoiEWAdBqg_Y24wyQyebBGbY52GmIUrjCm68sf8g
+Content-Type: application/json
+
+{
+  "host": "localhost",
+  "port": "5432",
+  "user": "testuser",
+  "password": "testpass",
+  "dbname": "postgres",
+  "ssl_mode": "disable",
+  "sql": "SELECT \"FirstName\", \"LastName\" FROM \"Employee\" WHERE \"Title\" = 'IT Staff' AND \"ReportsTo\" IS NULL;"
+}
