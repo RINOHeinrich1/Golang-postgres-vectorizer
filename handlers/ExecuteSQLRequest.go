@@ -84,8 +84,14 @@ func ExecuteSQLHandler(w http.ResponseWriter, r *http.Request) {
 
 		rowMap := make(map[string]interface{})
 		for i, col := range columns {
-			rowMap[col] = values[i]
+			val := values[i]
+			if b, ok := val.([]byte); ok {
+				rowMap[col] = string(b) // 🟢 convertit les []byte en string
+			} else {
+				rowMap[col] = val
+			}
 		}
+
 		results = append(results, rowMap)
 	}
 

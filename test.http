@@ -55,3 +55,33 @@ Content-Type: application/json
   "ssl_mode": "disable",
   "sql": "SELECT \"FirstName\", \"LastName\" FROM \"Employee\" WHERE \"Title\" = 'IT Staff' AND \"ReportsTo\" IS NULL;"
 }
+
+POST https://postgresvectorizer.onirtech.com/execute
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6IjZheHdLZFJDNUd0eW9hK1ciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL21lcWxid3hxY3llcWt2YXJlZ3BxLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyNjMwMWY3ZC1kYjgzLTRiNjctOThiYy02NTAwY2Q0ZTY2ZWYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUyNTYzNDEzLCJpYXQiOjE3NTI1NTk4MTMsImVtYWlsIjoiY29udGFjdEBvbmlydGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MjU1OTgxM31dLCJzZXNzaW9uX2lkIjoiMGNiYjU4OTgtNmYxYS00Yjk4LWFhMTktYzRiNDNmYTgwMmI2IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.yBMchVjT1IQISN-hCsR_3WgHTllLkpKlEC3jBuwpnSw
+Content-Type: application/json
+
+{
+  "host": "localhost",
+  "port": "5432",
+  "user": "testuser",
+  "password": "testpass",
+  "dbname": "postgres",
+  "ssl_mode": "disable",
+  "sql":  "SELECT EXTRACT(YEAR FROM AGE(\"HireDate\")) AS YearsOfSeniority FROM \"Employee\" WHERE \"FirstName\" = 'Laura' AND \"LastName\" = 'Callahan'"
+}
+
+
+
+POST https://postgresvectorizer.onirtech.com/execute
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6IjZheHdLZFJDNUd0eW9hK1ciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL21lcWxid3hxY3llcWt2YXJlZ3BxLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyNjMwMWY3ZC1kYjgzLTRiNjctOThiYy02NTAwY2Q0ZTY2ZWYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUyNTc0NDk1LCJpYXQiOjE3NTI1NzA4OTUsImVtYWlsIjoiY29udGFjdEBvbmlydGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MjU1OTgxM31dLCJzZXNzaW9uX2lkIjoiMGNiYjU4OTgtNmYxYS00Yjk4LWFhMTktYzRiNDNmYTgwMmI2IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.swdX57dTLikF5HVOIVLy071i7sUT4QCEOVnWAixowJQ
+Content-Type: application/json
+
+{
+  "host": "localhost",
+  "port": "5432",
+  "user": "testuser",
+  "password": "testpass",
+  "dbname": "postgres",
+  "ssl_mode": "disable",
+  "sql":  "SELECT \"BirthDate\" FROM \"Employee\" WHERE \"LastName\" = 'Edwards' AND \"FirstName\" = 'Nancy'"
+}
