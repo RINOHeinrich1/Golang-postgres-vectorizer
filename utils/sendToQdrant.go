@@ -10,7 +10,7 @@ import (
 	"github.com/qdrant/go-client/qdrant"
 )
 
-func SendToQdrant(text, source string, userId string, dataId string) error {
+func SendToQdrant(text, source, userId, dataId string) error {
 	host := os.Getenv("QDRANT_HOST")
 	portStr := os.Getenv("QDRANT_PORT")
 	apiKey := os.Getenv("QDRANT_API_KEY")
@@ -26,7 +26,7 @@ func SendToQdrant(text, source string, userId string, dataId string) error {
 
 	cfg := qdrant.Config{
 		Host:   host,
-		Port:   int(port),
+		Port:   port,
 		APIKey: apiKey,
 		UseTLS: true,
 	}
@@ -40,11 +40,13 @@ func SendToQdrant(text, source string, userId string, dataId string) error {
 		return fmt.Errorf("erreur embedder : %w", err)
 	}
 
-	// Générer un UUID string
-	id := uuid.New().String()
+	// UUIDv5 déterministe basé sur source+userId+dataId
+	name := fmt.Sprintf("%s|%s|%s", source, userId, dataId)
+	namespace := uuid.MustParse("6ba7b811-9dad-11d1-80b4-00c04fd430c8") // standard UUID namespace DNS
+	id := uuid.NewSHA1(namespace, []byte(name)).String()
 
 	point := &qdrant.PointStruct{
-		Id:      qdrant.NewIDUUID(id), // utiliser NewIDString pour un UUID
+		Id:      qdrant.NewIDUUID(id), // UUID déterministe
 		Vectors: qdrant.NewVectors(vector...),
 		Payload: qdrant.NewValueMap(map[string]any{
 			"text":     text,
