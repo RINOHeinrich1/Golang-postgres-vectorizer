@@ -89,6 +89,14 @@ func main() {
 			FieldName:      "source",
 			FieldType:      qdrant.FieldType_FieldTypeKeyword.Enum(),
 		})
+
+		// Indexer le champ source
+		_, err = client.CreateFieldIndex(ctx, &qdrant.CreateFieldIndexCollection{
+			CollectionName: collection,
+			FieldName:      "data_id",
+			FieldType:      qdrant.FieldType_FieldTypeKeyword.Enum(),
+		})
+
 		if err != nil {
 			log.Fatalf("Erreur lors de l'indexation du champ source : %v", err)
 		}
@@ -117,7 +125,7 @@ func main() {
 	mux.HandleFunc("/deletevectorizeddata", handlers.DeleteVectorizedDataHandler)
 	mux.HandleFunc("/ask", handlers.AskHandler)
 	mux.HandleFunc("/execute", handlers.ExecuteSQLHandler)
-
+	mux.HandleFunc("/insert-single", handlers.InsertSingleDocumentHandler)
 	protectedHandler := middlewares.CORSMiddleware(middlewares.JWTMiddleware(mux))
 
 	fmt.Printf("🚀 Serveur lancé sur http://%s\n", address)
