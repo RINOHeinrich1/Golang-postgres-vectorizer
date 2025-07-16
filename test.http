@@ -85,3 +85,18 @@ Content-Type: application/json
   "ssl_mode": "disable",
   "sql":  "SELECT \"BirthDate\" FROM \"Employee\" WHERE \"LastName\" = 'Edwards' AND \"FirstName\" = 'Nancy'"
 }
+
+
+POST https://postgresvectorizer.onirtech.com/render
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6IjZheHdLZFJDNUd0eW9hK1ciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL21lcWxid3hxY3llcWt2YXJlZ3BxLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyNjMwMWY3ZC1kYjgzLTRiNjctOThiYy02NTAwY2Q0ZTY2ZWYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUyNjc0MTIzLCJpYXQiOjE3NTI2NzA1MjMsImVtYWlsIjoiY29udGFjdEBvbmlydGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MjU4MzczOX1dLCJzZXNzaW9uX2lkIjoiZGQ5YjgyM2UtMDNkYS00YTViLTljNDgtMWVjMzI4NTdhNmE1IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.3ruR4MUorT5l74doqOiCE0r1CtslUL-zGuX2k08SvoI
+Content-Type: application/json
+
+{
+  "host": "localhost",
+  "port": "5432",
+  "user": "testuser",
+  "password": "testpass",
+  "dbname": "postgres",
+  "ssl_mode": "disable",
+  "template": "Voici la liste des postes disponibles: {{.listeDesPostes}}"
+}
