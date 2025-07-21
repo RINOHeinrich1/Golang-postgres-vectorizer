@@ -132,7 +132,13 @@ func RenderTemplateFromDBHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				resultRows = append(resultRows, row)
 			}
-			varMap[varName] = resultRows
+			jsonBytes, err := json.Marshal(resultRows)
+			if err != nil {
+				http.Error(w, "Erreur encodage JSON: "+err.Error(), http.StatusInternalServerError)
+				return
+			}
+			varMap[varName] = string(jsonBytes)
+
 		} else {
 			// Sinon valeur simple
 			varMap[varName] = valeurTrimmed

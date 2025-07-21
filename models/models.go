@@ -37,3 +37,10 @@ type QdrantPoint struct {
 type QdrantUpsertRequest struct {
 	Points []QdrantPoint `json:"points"`
 }
+
+type ForeignKey struct {
+	SourceTable  string `json:"source_table"`
+	SourceColumn string `json:"source_column"`
+	TargetTable  string `json:"target_table"`
+	TargetColumn string `json:"target_column"`
+}

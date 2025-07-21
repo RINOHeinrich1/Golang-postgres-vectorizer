@@ -41,9 +41,7 @@ func GetTablesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erreur connexion DB: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// Requête pour récupérer tables et colonnes
-	query := `
+	columnsQuery := `
 	SELECT
 		c.table_name,
 		c.column_name,
@@ -62,19 +60,19 @@ func GetTablesHandler(w http.ResponseWriter, r *http.Request) {
 		c.table_name, c.ordinal_position;
 	`
 
-	rows, err := db.Query(query)
+	columnRows, err := db.Query(columnsQuery)
 	if err != nil {
-		http.Error(w, "Erreur requête : "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Erreur requête colonnes : "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer rows.Close()
+	defer columnRows.Close()
 
 	tablesMap := make(map[string][]models.Column)
 
-	for rows.Next() {
+	for columnRows.Next() {
 		var tableName, columnName, dataType, isNullable string
-		if err := rows.Scan(&tableName, &columnName, &dataType, &isNullable); err != nil {
-			http.Error(w, "Erreur scan : "+err.Error(), http.StatusInternalServerError)
+		if err := columnRows.Scan(&tableName, &columnName, &dataType, &isNullable); err != nil {
+			http.Error(w, "Erreur scan colonnes : "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 		tablesMap[tableName] = append(tablesMap[tableName], models.Column{
@@ -82,6 +80,41 @@ func GetTablesHandler(w http.ResponseWriter, r *http.Request) {
 			DataType:   dataType,
 			IsNullable: isNullable,
 		})
+	}
+
+	// Relations (clefs étrangères)
+	relationsQuery := `
+	SELECT
+		tc.table_name AS source_table,
+		kcu.column_name AS source_column,
+		ccu.table_name AS target_table,
+		ccu.column_name AS target_column
+	FROM
+		information_schema.table_constraints AS tc
+	JOIN information_schema.key_column_usage AS kcu
+		ON tc.constraint_name = kcu.constraint_name
+	JOIN information_schema.constraint_column_usage AS ccu
+		ON ccu.constraint_name = tc.constraint_name
+	WHERE
+		tc.constraint_type = 'FOREIGN KEY'
+		AND tc.table_schema = 'public';
+	`
+
+	relRows, err := db.Query(relationsQuery)
+	if err != nil {
+		http.Error(w, "Erreur relations : "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer relRows.Close()
+
+	var foreignKeys []models.ForeignKey
+	for relRows.Next() {
+		var fk models.ForeignKey
+		if err := relRows.Scan(&fk.SourceTable, &fk.SourceColumn, &fk.TargetTable, &fk.TargetColumn); err != nil {
+			http.Error(w, "Erreur scan relations : "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		foreignKeys = append(foreignKeys, fk)
 	}
 
 	// Convertir map en slice
@@ -94,5 +127,11 @@ func GetTablesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(tables)
+	json.NewEncoder(w).Encode(struct {
+		Tables      []models.Table      `json:"tables"`
+		ForeignKeys []models.ForeignKey `json:"foreign_keys"`
+	}{
+		Tables:      tables,
+		ForeignKeys: foreignKeys,
+	})
 }

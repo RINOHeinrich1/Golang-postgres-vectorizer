@@ -103,6 +103,12 @@ func main() {
 			FieldName:      "template",
 			FieldType:      qdrant.FieldType_FieldTypeKeyword.Enum(),
 		})
+		_, err = client.CreateFieldIndex(ctx, &qdrant.CreateFieldIndexCollection{
+			CollectionName: collection,
+			FieldName:      "contextual",
+			FieldType:      qdrant.FieldType_FieldTypeKeyword.Enum(),
+		})
+
 		if err != nil {
 			log.Fatalf("Erreur lors de l'indexation du champ source : %v", err)
 		}
