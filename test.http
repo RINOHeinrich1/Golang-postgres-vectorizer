@@ -20,16 +20,17 @@ POST  http://localhost:7777/generetestdatabase
 
 GET http://localhost:7777/tables?host=localhost&port=5432&user=testuser&password=testpass&dbname=testdb
 
-POST http://localhost:7777/staticvectorizer
+POST https://postgresvectorizer.onirtech.com/staticvectorizer
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6IjZheHdLZFJDNUd0eW9hK1ciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL21lcWxid3hxY3llcWt2YXJlZ3BxLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyNjMwMWY3ZC1kYjgzLTRiNjctOThiYy02NTAwY2Q0ZTY2ZWYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUzMTc4MDc4LCJpYXQiOjE3NTMxNzQ0NzgsImVtYWlsIjoiY29udGFjdEBvbmlydGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MzA5OTY1Nn1dLCJzZXNzaW9uX2lkIjoiZTJkNGQ3OTYtMWEyYy00ZGUyLTgwNjktNzE2ZjNkYmU1YzI0IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.J0P-Xmjhf2OCZYEdKtyqAQulNQxJAmfFXlYsar8-TMA
+Content-Type: application/json
 
 {
   "host": "localhost",
   "port": 5432,
   "user": "testuser",
   "password": "testpass",
-  "dbname": "testdb",
-  "table_name": "produits",
-  "template": "Le  {{.nom}} porte la description suivante: {{.description}}, il coûte: {{.prix}} EUR",
+  "dbname": "postgres",
+  "template": "L'employés {{.Employee.LastName}} {{.Employee.FirstName}} tenant  le poste  de {{.Employee.Title}} habite à l'adresse {{.Employee.Address}} dans le ville de {{.Employee.City}}, dans l' etat de {{.Employee.State}}",
   "page_size": 50
 }
 

@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"regexp"
 	"strings"
 	"text/template"
 
@@ -13,22 +15,6 @@ import (
 	"github.com/RINOHeinrich1/postgres-vectorizer/models"
 	"github.com/RINOHeinrich1/postgres-vectorizer/utils"
 )
-
-func getPrimaryKey(db *sql.DB, tableName string) (string, error) {
-	query := fmt.Sprintf(`
-		SELECT a.attname
-		FROM   pg_index i
-		JOIN   pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
-		WHERE  i.indrelid = '"%s"'::regclass AND i.indisprimary;
-	`, tableName) // ⚠️ attention à l'injection SQL si la tableName est mal contrôlée
-
-	var primaryKey string
-	err := db.QueryRow(query).Scan(&primaryKey)
-	if err != nil {
-		return "", fmt.Errorf("clé primaire introuvable pour %s : %w", tableName, err)
-	}
-	return primaryKey, nil
-}
 
 func StaticVectorizerHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -53,8 +39,8 @@ func StaticVectorizerHandler(w http.ResponseWriter, r *http.Request) {
 	if req.PageSize <= 0 {
 		req.PageSize = 100
 	}
-	if req.TableName == "" || req.Template == "" {
-		http.Error(w, "table_name et template sont obligatoires", http.StatusBadRequest)
+	if req.Template == "" {
+		http.Error(w, "template est obligatoire", http.StatusBadRequest)
 		return
 	}
 
@@ -73,6 +59,31 @@ func StaticVectorizerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Étape 1 : Parse le template pour extraire les chemins .Table.Colonne
+	re := regexp.MustCompile(`{{\s*\.([^.]+)\.([^\s}]+)\s*}}`)
+	matches := re.FindAllStringSubmatch(req.Template, -1)
+	tableColumnMap := make(map[string][]string)
+	for _, match := range matches {
+		table := match[1]
+		column := match[2]
+		tableColumnMap[table] = append(tableColumnMap[table], column)
+	}
+
+	if len(tableColumnMap) == 0 {
+		http.Error(w, "Aucune variable détectée dans le template", http.StatusBadRequest)
+		return
+	}
+
+	// Étape 2 : Générer la requête SQL avec JOINs
+	query, _, err := utils.GenerateSQLWithJoins(db, tableColumnMap, req.PageSize)
+	if err != nil {
+		http.Error(w, "Erreur génération SQL: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	offset := 0
+	totalProcessed := 0
+
 	// Préparer le template
 	tmpl, err := template.New("line").Parse(req.Template)
 	if err != nil {
@@ -80,13 +91,11 @@ func StaticVectorizerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	offset := 0
-	totalProcessed := 0
-
 	for {
-		rows, err := db.Query(fmt.Sprintf(`SELECT * FROM "%s" LIMIT %d OFFSET %d`, req.TableName, req.PageSize, offset))
+		fullQuery := fmt.Sprintf("%s OFFSET %d", query, offset)
+		rows, err := db.Query(fullQuery)
 		if err != nil {
-			http.Error(w, "Erreur requête SQL: "+err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Erreur exécution SQL: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -96,51 +105,64 @@ func StaticVectorizerHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Erreur récupération colonnes: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-
+		log.Println("COLONNES:", cols)
 		count := 0
-
 		for rows.Next() {
 			values := make([]interface{}, len(cols))
 			valuePtrs := make([]interface{}, len(cols))
 			for i := range values {
 				valuePtrs[i] = &values[i]
 			}
-
 			if err := rows.Scan(valuePtrs...); err != nil {
 				rows.Close()
 				http.Error(w, "Erreur scan ligne: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
 
-			data := make(map[string]interface{})
+			// Mapper vers un objet structuré pour le template
+			templateData := make(map[string]map[string]interface{})
 			for i, col := range cols {
+				parts := strings.SplitN(col, "_", 2)
+				if len(parts) != 2 {
+					continue
+				}
+				table := parts[0]
+				field := parts[1]
+
+				if _, ok := templateData[table]; !ok {
+					templateData[table] = make(map[string]interface{})
+				}
+
 				val := values[i]
 				if b, ok := val.([]byte); ok {
-					data[col] = string(b)
+					templateData[table][field] = string(b)
 				} else {
-					data[col] = val
+					templateData[table][field] = val
 				}
 			}
-
+			log.Println("Data template: ", templateData)
 			var buf strings.Builder
-			if err := tmpl.Execute(&buf, data); err != nil {
+			if err := tmpl.Execute(&buf, templateData); err != nil {
 				rows.Close()
 				http.Error(w, "Erreur exécution template: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
 
-			// Envoi à Qdrant
-			source := fmt.Sprintf("%s/%s", req.DBName, req.TableName)
-			// Récupération de la clé primaire
-			primaryKey, err := getPrimaryKey(db, req.TableName)
+			// Récupération de la clé primaire de la table principale
+			var mainTable string
+			for t := range tableColumnMap {
+				mainTable = t
+				break
+			}
+			uniqueId, err := utils.GetUniqueColumn(db, mainTable)
 			if err != nil {
 				http.Error(w, "Erreur récupération clé primaire: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
-
-			idValue := data[primaryKey]
+			idValue := templateData[mainTable][uniqueId]
 			dataID := fmt.Sprintf("%v", idValue)
-
+			log.Println("dataID", dataID)
+			source := fmt.Sprintf("%s", req.DBName)
 			if err := utils.SendToQdrant(buf.String(), source, userID, dataID, "False", "False"); err != nil {
 				rows.Close()
 				http.Error(w, "Erreur envoi à Qdrant: "+err.Error(), http.StatusInternalServerError)
@@ -150,7 +172,6 @@ func StaticVectorizerHandler(w http.ResponseWriter, r *http.Request) {
 			count++
 			totalProcessed++
 		}
-
 		rows.Close()
 
 		if count < req.PageSize {
