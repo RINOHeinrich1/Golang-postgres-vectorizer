@@ -25,12 +25,12 @@ type FormatRequest struct {
 	ConnParams
 	TableName string `json:"table_name"`
 	Template  string `json:"template"`
-	PageSize  int    `json:"page_size,omitempty"` // optionnel, défaut 100
+	PageSize  int    `json:"page_size,omitempty"`
 }
 
 type QdrantPoint struct {
 	ID      string                 `json:"id"`
-	Vector  []float32              `json:"vector"` // ici vecteur vide car tu n'as pas intégré l'embedding
+	Vector  []float32              `json:"vector"`
 	Payload map[string]interface{} `json:"payload"`
 }
 

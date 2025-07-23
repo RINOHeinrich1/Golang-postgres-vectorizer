@@ -20,18 +20,18 @@ POST  http://localhost:7777/generetestdatabase
 
 GET http://localhost:7777/tables?host=localhost&port=5432&user=testuser&password=testpass&dbname=testdb
 
-POST https://postgresvectorizer.onirtech.com/staticvectorizer
+POST https://postgresvectorizer.onirtech.com/execute
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6IjZheHdLZFJDNUd0eW9hK1ciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL21lcWxid3hxY3llcWt2YXJlZ3BxLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyNjMwMWY3ZC1kYjgzLTRiNjctOThiYy02NTAwY2Q0ZTY2ZWYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUzMTc4MDc4LCJpYXQiOjE3NTMxNzQ0NzgsImVtYWlsIjoiY29udGFjdEBvbmlydGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MzA5OTY1Nn1dLCJzZXNzaW9uX2lkIjoiZTJkNGQ3OTYtMWEyYy00ZGUyLTgwNjktNzE2ZjNkYmU1YzI0IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.J0P-Xmjhf2OCZYEdKtyqAQulNQxJAmfFXlYsar8-TMA
 Content-Type: application/json
 
 {
   "host": "localhost",
-  "port": 5432,
+  "port": "5432",
   "user": "testuser",
   "password": "testpass",
   "dbname": "postgres",
-  "template": "L'employés {{.Employee.LastName}} {{.Employee.FirstName}} tenant  le poste  de {{.Employee.Title}} habite à l'adresse {{.Employee.Address}} dans le ville de {{.Employee.City}}, dans l' etat de {{.Employee.State}}",
-  "page_size": 50
+  "ssl_mode": "disable",
+  "sql": ""
 }
 
 POST http://localhost:7777/ask
@@ -44,7 +44,7 @@ Content-Type: application/json
 }
 
 POST https://postgresvectorizer.onirtech.com/execute
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6IjZheHdLZFJDNUd0eW9hK1ciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL21lcWxid3hxY3llcWt2YXJlZ3BxLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyNjMwMWY3ZC1kYjgzLTRiNjctOThiYy02NTAwY2Q0ZTY2ZWYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUyMjI4ODcyLCJpYXQiOjE3NTIyMjUyNzIsImVtYWlsIjoiY29udGFjdEBvbmlydGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MjE0Njk2Nn1dLCJzZXNzaW9uX2lkIjoiNzFjNDBkYmUtNDVkZC00YjA4LTg2ZGEtYjJiMzViYTFlMjRlIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.RfYUoiEWAdBqg_Y24wyQyebBGbY52GmIUrjCm68sf8g
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6IjZheHdLZFJDNUd0eW9hK1ciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL21lcWxid3hxY3llcWt2YXJlZ3BxLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyNjMwMWY3ZC1kYjgzLTRiNjctOThiYy02NTAwY2Q0ZTY2ZWYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUzMjYyNjY1LCJpYXQiOjE3NTMyNTkwNjUsImVtYWlsIjoiY29udGFjdEBvbmlydGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MzA5OTY1Nn1dLCJzZXNzaW9uX2lkIjoiZTJkNGQ3OTYtMWEyYy00ZGUyLTgwNjktNzE2ZjNkYmU1YzI0IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.BoR-90sWImTH2z7kGuy7-qc9KYyYgQuA2SllU0UAlaM
 Content-Type: application/json
 
 {
@@ -57,8 +57,9 @@ Content-Type: application/json
   "sql": "SELECT \"FirstName\", \"LastName\" FROM \"Employee\" WHERE \"Title\" = 'IT Staff' AND \"ReportsTo\" IS NULL;"
 }
 
+
 POST https://postgresvectorizer.onirtech.com/execute
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6IjZheHdLZFJDNUd0eW9hK1ciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL21lcWxid3hxY3llcWt2YXJlZ3BxLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyNjMwMWY3ZC1kYjgzLTRiNjctOThiYy02NTAwY2Q0ZTY2ZWYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUyNTYzNDEzLCJpYXQiOjE3NTI1NTk4MTMsImVtYWlsIjoiY29udGFjdEBvbmlydGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MjU1OTgxM31dLCJzZXNzaW9uX2lkIjoiMGNiYjU4OTgtNmYxYS00Yjk4LWFhMTktYzRiNDNmYTgwMmI2IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.yBMchVjT1IQISN-hCsR_3WgHTllLkpKlEC3jBuwpnSw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6IjZheHdLZFJDNUd0eW9hK1ciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL21lcWxid3hxY3llcWt2YXJlZ3BxLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyNjMwMWY3ZC1kYjgzLTRiNjctOThiYy02NTAwY2Q0ZTY2ZWYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUzMjY2NzIxLCJpYXQiOjE3NTMyNjMxMjEsImVtYWlsIjoiY29udGFjdEBvbmlydGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MzA5OTY1Nn1dLCJzZXNzaW9uX2lkIjoiZTJkNGQ3OTYtMWEyYy00ZGUyLTgwNjktNzE2ZjNkYmU1YzI0IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.gAtWLFGysoNQ_7N9GD93FRu4vypqDKbNWe0PkNPknHs
 Content-Type: application/json
 
 {
@@ -66,25 +67,9 @@ Content-Type: application/json
   "port": "5432",
   "user": "testuser",
   "password": "testpass",
-  "dbname": "postgres",
+  "dbname": "testdb",
   "ssl_mode": "disable",
-  "sql":  "SELECT EXTRACT(YEAR FROM AGE(\"HireDate\")) AS YearsOfSeniority FROM \"Employee\" WHERE \"FirstName\" = 'Laura' AND \"LastName\" = 'Callahan'"
-}
-
-
-
-POST https://postgresvectorizer.onirtech.com/execute
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsImtpZCI6IjZheHdLZFJDNUd0eW9hK1ciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL21lcWxid3hxY3llcWt2YXJlZ3BxLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyNjMwMWY3ZC1kYjgzLTRiNjctOThiYy02NTAwY2Q0ZTY2ZWYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUyNTc0NDk1LCJpYXQiOjE3NTI1NzA4OTUsImVtYWlsIjoiY29udGFjdEBvbmlydGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1MjU1OTgxM31dLCJzZXNzaW9uX2lkIjoiMGNiYjU4OTgtNmYxYS00Yjk4LWFhMTktYzRiNDNmYTgwMmI2IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.swdX57dTLikF5HVOIVLy071i7sUT4QCEOVnWAixowJQ
-Content-Type: application/json
-
-{
-  "host": "localhost",
-  "port": "5432",
-  "user": "testuser",
-  "password": "testpass",
-  "dbname": "postgres",
-  "ssl_mode": "disable",
-  "sql":  "SELECT \"BirthDate\" FROM \"Employee\" WHERE \"LastName\" = 'Edwards' AND \"FirstName\" = 'Nancy'"
+  "sql": "SELECT \"prix\" FROM \"produits\" WHERE \"nom\" = 'Chaise';"
 }
 
 

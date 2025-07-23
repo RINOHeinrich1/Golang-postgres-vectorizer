@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 type EmbedRequest struct {
@@ -30,7 +31,11 @@ func Embed(text string) ([]float32, error) {
 		return nil, fmt.Errorf("erreur encodage JSON: %w", err)
 	}
 
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	client := &http.Client{
+		Timeout: 10 * time.Minute, // 🕒 Timeout ici
+	}
+
+	resp, err := client.Post(url, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		return nil, fmt.Errorf("erreur requête HTTP embedder: %w", err)
 	}
