@@ -39,8 +39,21 @@ func StaticVectorizerHandler(w http.ResponseWriter, r *http.Request) {
 	if req.PageSize <= 0 {
 		req.PageSize = 100
 	}
+	source := req.DBName
+
 	if req.Template == "" {
-		http.Error(w, "template est obligatoire", http.StatusBadRequest)
+		// Pas de template => suppression des points existants
+		log.Printf("Template vide. Suppression des points Qdrant pour userID=%s et source=%s", userID, source)
+		if err := utils.DeleteFromQdrantByFilter(userID, source); err != nil {
+			log.Printf("Erreur suppression Qdrant: %v", err)
+			http.Error(w, "Erreur suppression Qdrant: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"message": "Points supprimés dans Qdrant (template vide)",
+		})
 		return
 	}
 
@@ -105,7 +118,6 @@ func StaticVectorizerHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Erreur récupération colonnes: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		log.Println("COLONNES:", cols)
 		count := 0
 		for rows.Next() {
 			values := make([]interface{}, len(cols))
